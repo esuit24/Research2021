@@ -8,6 +8,7 @@ import numpy as np
 from scipy import optimize as sp
 import math
 import Set_Emnist_Data as data
+from random import uniform
 
 
 # In[5]:
@@ -21,7 +22,7 @@ def sigmoid(z):
 def sigmoidGradient(z):
     return sigmoid(z)*(1-sigmoid(z))
 
-def randomly_initialize(self, num_in, num_out):
+def randomly_initialize(num_in, num_out):
     epsilon = 0.12
     size = num_out*(num_in+1)
     all_weights = np.zeros((size,))
@@ -79,7 +80,7 @@ def predict(weights, x_vals):
 #params: nn_params(array that consists of 2 weight matricies for layer 1 and 2 respectively), input_layer_size (number of input units),
 #hidden_layer_size (number of hidden units), num_labels (number of output units), x (training samples), y (expected output values), lambda_reg (regularization constant)
 #returns cost and an array of weight gradient vectors
-def nnCostFunction(nn_params, input_layer_size, hidden_layer_size, num_labels, X, y, lambda_reg):
+def nnCostFunction(nn_params, input_layer_size, hidden_layer_size, num_labels, X, y, lambda_reg,m):
     data.theta1 = np.reshape(nn_params[:hidden_layer_size*(input_layer_size+1)],(hidden_layer_size, input_layer_size+1))
     data.theta2 = np.reshape(nn_params[hidden_layer_size*(input_layer_size+1):], (num_labels, hidden_layer_size+1))
 
@@ -94,7 +95,7 @@ def nnCostFunction(nn_params, input_layer_size, hidden_layer_size, num_labels, X
     cost_temp = 0
 
     # for each training example
-    for t in range(data.m):
+    for t in range(m):
 
         ## step 1: perform forward pass
         x = X[t]
