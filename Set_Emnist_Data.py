@@ -6,6 +6,7 @@
 
 import pandas as pd
 import numpy as np
+import Random_Initialization as r
 
 
 # In[2]:
@@ -17,12 +18,13 @@ yfile = '/Users/elliesuit/emnist/Emnist Data/Y.csv'
 df3 = pd.read_csv(xfile, header = None)
 df4 = pd.read_csv(yfile, header = None)
 input_layer_size = 400
-hidden_layer_size = 25
+hidden_layer_size = 400
 num_labels = 10
-num_layers = 2
 
 theta1 = np.zeros([hidden_layer_size,input_layer_size+1])
 theta2 = np.zeros([num_labels,hidden_layer_size+1])
+theta1 = r.randomly_initialize(input_layer_size, hidden_layer_size)
+theta2 = r.randomly_initialize(hidden_layer_size, num_labels)
 x = np.zeros((len(df3),input_layer_size))
 y_vec = np.zeros((len(df4),))
 

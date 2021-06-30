@@ -1,3 +1,9 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[4]:
+
+
 import numpy as np
 from scipy import optimize as sp
 import math
@@ -16,18 +22,27 @@ def sigmoid(z):
 def sigmoidGradient(z):
     return sigmoid(z)*(1-sigmoid(z))
 
+def randomly_initialize(num_in, num_out):
+    epsilon = 0.12
+    size = num_out*(num_in+1)
+    all_weights = np.zeros((size,))
+    for i in range(size):
+        all_weights[i] = uniform(-epsilon, epsilon)
+    weights = np.reshape(all_weights,(num_out,num_in+1))
+    return weights
+
 #calculates the regularization term for the neural network, params: lambda (regularization constant),
 #m (number of training samples), returns regularization value
-def regularization(lamda, m, theta1, theta2):
+def regularization(lamda, m):
     lamda_val = lamda/(2.0*m)
     theta1_sum = 0
     theta2_sum = 0
-    for j in range(len(theta1)-1):
-        for k in range(theta1[0].size-1):
-            theta1_sum += theta1[j+1][k+1]*theta1[j+1][k+1]
-    for j in range(len(theta2)-1):
-        for k in range(theta2[0].size-1):
-            theta2_sum += theta2[j+1][k+1]*theta2[j+1][k+1]
+    for j in range(len(data.theta1)-1):
+        for k in range(data.theta1[0].size-1):
+            theta1_sum += data.theta1[j+1][k+1]*data.theta1[j+1][k+1]
+    for j in range(len(data.theta2)-1):
+        for k in range(data.theta2[0].size-1):
+            theta2_sum += data.theta2[j+1][k+1]*data.theta2[j+1][k+1]
     return lamda_val*(theta1_sum+theta2_sum)
 
 #calculates the cost for the neural network, params: y_vals (expected output values), hyp (calculated output values),
@@ -35,19 +50,7 @@ def regularization(lamda, m, theta1, theta2):
 def calc_cost(y_vals, hyp, lamda, m): #hyp and y are both 10x1 vectors
     cost = 0
     for k in range(y_vals.size):
-        if (hyp[k] == 0):
-            cost = 0
-        elif (hyp[k] > 1):
-            print("Overload")
-        else:
-            try:
-                term1 = -y_vals[k] * math.log(hyp[k])
-                term2 = (1-y_vals[k])*math.log(1-abs(hyp[k]))
-                cost+= term1 - term2
-            except Exception as e:
-                cost+= 0
-                break
-            #cost += -y_vals[k] * math.log(abs(hyp[k])) - (1-y_vals[k])*math.log(1-abs(hyp[k]))
+        cost += -y_vals[k] * math.log(hyp[k]) - (1-y_vals[k])*math.log(1-hyp[k])
     return cost
 
 #predicts the number that correlates to the input data, params: weights(an array that consists of 2 weight matricies),
@@ -131,9 +134,8 @@ def nnCostFunction(nn_params, input_layer_size, hidden_layer_size, num_labels, X
 
     #Accumulate cost values and regularize to get Cost(J)
     term1 = (1/data.m)*cost_temp
-    term2 = regularization(lambda_reg, data.m, data.theta1, data.theta2)
+    term2 = regularization(lambda_reg, data.m)
     J = term1 + term2
-    print("Cost: " + str(J))
 
     # step 5: obtain gradient for neural net cost function by dividing the accumulated gradients by m
     Theta1_grad = bigDelta1 / data.m
