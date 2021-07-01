@@ -18,7 +18,7 @@ yfile = '/Users/elliesuit/emnist/Emnist Data/Y.csv'
 df3 = pd.read_csv(xfile, header = None)
 df4 = pd.read_csv(yfile, header = None)
 input_layer_size = 400
-hidden_layer_size = 400
+hidden_layer_size = 25
 num_labels = 10
 
 theta1 = np.zeros([hidden_layer_size,input_layer_size+1])

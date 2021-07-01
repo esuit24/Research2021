@@ -71,7 +71,7 @@ def predict(weights, x_vals):
         prediction = max_index+1
         if prediction == 10:
             prediction = 0
-        return prediction
+        return prediction, max_val
 
 #performs forward and backward prop to get a final cost value, J, and 2 gradient weight matricies
 #params: nn_params(array that consists of 2 weight matricies for layer 1 and 2 respectively), input_layer_size (number of input units),
