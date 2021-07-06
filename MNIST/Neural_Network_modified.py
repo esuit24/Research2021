@@ -37,13 +37,19 @@ def regularization(lamda, m):
     lamda_val = lamda/(2.0*m)
     theta1_sum = 0
     theta2_sum = 0
-    for j in range(len(data.theta1)-1):
-        for k in range(data.theta1[0].size-1):
-            theta1_sum += data.theta1[j+1][k+1]*data.theta1[j+1][k+1]
-    for j in range(len(data.theta2)-1):
-        for k in range(data.theta2[0].size-1):
-            theta2_sum += data.theta2[j+1][k+1]*data.theta2[j+1][k+1]
-    return lamda_val*(theta1_sum+theta2_sum)
+    theta_sum = 0
+    #for j in range(len(data.theta1)-1):
+        #for k in range(data.theta1[0].size-1):
+        #    theta1_sum += data.theta1[j+1][k+1]*data.theta1[j+1][k+1]
+    #for j in range(len(data.theta2)-1):
+        #for k in range(data.theta2[0].size-1):
+        #    theta2_sum += data.theta2[j+1][k+1]*data.theta2[j+1][k+1]
+    for layer in range(len(data.weights)):
+        for r in range(len(data.weights[layer]-1)):
+            for c in range(data.weights[layer][0].size-1):
+                matrix = data.weights[layer]
+                theta_sum += matrix[r+1][c+1]*matrix[r+1][c+1]
+    return lamda_val*(theta1_sum+theta2_sum+theta_sum)#maybe remove theta1 and theta2 to avoid double counting
 
 #calculates the cost for the neural network, params: y_vals (expected output values), hyp (calculated output values),
 #m (number of training samples), returns cost between given sample and expected value
@@ -83,8 +89,19 @@ def predict(weights, x_vals):
 def nnCostFunction(nn_params, input_layer_size, hidden_layer_size, num_labels, X, y, lambda_reg,m):
     data.theta1 = np.reshape(nn_params[:hidden_layer_size*(input_layer_size+1)],(hidden_layer_size, input_layer_size+1))
     data.theta2 = np.reshape(nn_params[hidden_layer_size*(input_layer_size+1):], (num_labels, hidden_layer_size+1))
+    curr_size = hidden_layer_size*(input_layer_size+1)
+    layer = 1
+    #sets weight values with given number of hidden layers
+    theta_vals = np.zeros(data.weights.size)
+    while (layer < len(weights)-1):
+        theta_vals[layer] = np.reshape(nn_params[curr_size:hidden_layer_size*(hidden_layer_size+1)], (hidden_layer_size, hidden_layer_size+1))
+        layer+=1
+        curr_size += hidden_layer_size*(hidden_layer_size+1)
+    theta_vals[0] = data.theta1
+    theta_vals[len(data.weights)] = data.theta2
 
     J = 0;
+    theta_grads = np.zeros(data.weights.size)
     Theta1_grad = np.zeros_like(data.theta1)
     Theta2_grad = np.zeros_like(data.theta2)
 
@@ -92,6 +109,7 @@ def nnCostFunction(nn_params, input_layer_size, hidden_layer_size, num_labels, X
 
     bigDelta1 = 0
     bigDelta2 = 0
+    bigDelta_vals = np.zeros((len(data.weights),))
     cost_temp = 0
 
     # for each training example
@@ -109,6 +127,16 @@ def nnCostFunction(nn_params, input_layer_size, hidden_layer_size, num_labels, X
         # calculate z3 (linear combination) and a3 (activation for layer 3 aka final hypothesis)
         z3 = np.matmul(a2,data.theta2.T)
         a3 = sigmoid(z3)
+
+        #this part to accomodate for different number of hidden layers
+        ax = a2
+        activations = np.zeros((len(data.weights),))
+        for element in range(len(data.weights.size)):
+            zx = np.matmul(ax, data.weights[element].T)
+            ax = sigmoid(zx)
+            activations[element] = ax
+            ax = np.hstack(([1],ax))
+
 
         #Backpropogation:
 
@@ -131,6 +159,18 @@ def nnCostFunction(nn_params, input_layer_size, hidden_layer_size, num_labels, X
         bigDelta2 += np.outer(delta3, a2)
         #Update the total cost given the cost from this sample
         cost_temp += calc_cost(y_vals, a3, lambda_reg, data.m)
+
+
+        #this part to accomodate for different number of hidden layers
+
+        = delta2
+        index = len(data.weights)-2
+        while (index >= 0):
+            curr_weight = data.weights[index]
+            deltax = np.matmul(curr_weight[:,1:].T, delta_prev)
+            delta_prev = deltax
+            index -= 1 
+
 
     #Accumulate cost values and regularize to get Cost(J)
     term1 = (1/data.m)*cost_temp
