@@ -31,13 +31,16 @@ def create_training_set(num_samples):
     #because x_vals in range (-1,1)... mean must be in range (-0.25, 0.25)
     training_data = np.zeros((num_samples, 21))
     means = np.zeros((num_samples,))
+    sigmas = np.zeros((num_samples,))
     sample = 0
     while (sample < len(training_data)):
         random_mean = uniform(-0.25, 0.25)
+        random_sigma = uniform(-0.25, 0.25)
         means[sample] = random_mean
-        training_data[sample] = gaussian(random_mean)
+        sigmas[sample] = random_sigma
+        training_data[sample] = gaussian(random_mean, random_sigma)
         sample += 1
-    return training_data, means
+    return training_data, means, sigmas
 #figure out what the range is... why is it (-0.25, 0.25)? Exact parameters for initializing data?
 
 
