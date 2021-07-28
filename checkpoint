@@ -1,0 +1,2 @@
+model_checkpoint_path: "generalized_normal"
+all_model_checkpoint_paths: "generalized_normal"

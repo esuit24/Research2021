@@ -29,14 +29,24 @@ def create_training_set(num_samples, num_x_vals = 21): #pass in number of x valu
     for i in range(num_samples):
         #initializing labels
         #print("sample number: "  + str(i))
-        random_mu = uniform(-5, 5)
-        random_mu = 0 #remove later
+        random_mu = uniform(-0.25, 0.25)
+        #random_mu = 0 #remove later
         mu_vals[i] = random_mu
-        random_alpha = uniform(0,5)
-        random_alpha = 1 #remove later
+        random_alpha = uniform(1,2)
         alpha_vals[i] = random_alpha
         random_beta = uniform(1,5) #(0,1) (not inclusive of 0) is in the domain too but change later to accomodate for complex
         beta_vals[i] = random_beta
         training_data[i] = function(random_mu, random_alpha, random_beta, num_x_vals)
-
+    scale(mu_vals)
+    scale(alpha_vals)
+    scale(beta_vals)
     return training_data, mu_vals, alpha_vals, beta_vals
+
+def scale(vals):
+    sum = 0
+    for i in range(len(vals)):
+        sum += vals[i] * vals[i]
+    scale_factor = math.sqrt((1/len(vals)) * sum)
+    for j in range(len(vals)):
+        vals[j] = vals[j] / scale_factor
+    return vals
